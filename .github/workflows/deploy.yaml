@@ -47,6 +47,19 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKERHUB_USER }}/employee-portal-frontend:latest
 
+      - name: Debug Check Secrets
+        run: |
+          echo "=== SECRET CHECK ==="
+          if [ -z "${EC2_HOST}" ]; then echo "❌ EC2_HOST_ADDRESS is MISSING/EMPTY"; else echo "✅ EC2_HOST_ADDRESS is set (length: ${#EC2_HOST})"; fi
+          if [ -z "${EC2_USER}" ]; then echo "❌ EC2_USERNAME is MISSING/EMPTY"; else echo "✅ EC2_USERNAME is set (length: ${#EC2_USER})"; fi
+          if [ -z "${EC2_KEY}" ]; then echo "❌ EC2_SSH_KEY is MISSING/EMPTY"; else echo "✅ EC2_SSH_KEY is set (length: ${#EC2_KEY})"; fi
+          if [ -z "${DOCKER_USER}" ]; then echo "❌ DOCKERHUB_USER is MISSING/EMPTY"; else echo "✅ DOCKERHUB_USER is set (length: ${#DOCKER_USER})"; fi
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST_ADDRESS }}
+          EC2_USER: ${{ secrets.EC2_USERNAME }}
+          EC2_KEY: ${{ secrets.EC2_SSH_KEY }}
+          DOCKER_USER: ${{ secrets.DOCKERHUB_USER }}
+
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
