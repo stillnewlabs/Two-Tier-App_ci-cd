@@ -1,21 +1,24 @@
-name: Ci/CD pipeline for two tier application_employee management portal
-on :
+name: "CI/CD pipeline for two tier application_employee management portal"
+
+on:
   push:
-   branches: 
-   - main
-   jobs: build and depoly the application
-   runs-on: ubuntu:latest
-   steps:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
       - name: Show System Information
         run: |
           pwd
           ls -la
           whoami
           hostname
-          free
-          htop -t
+          free -m
           cat /etc/os-release
           uname -a
           lscpu
@@ -27,12 +30,15 @@ on :
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKER_PASS }}
+
       - name: Build Backend Image
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USER }}/employee-portal-backend:latest ./backend
+
       - name: Frontend Image Building
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USER }}/employee-portal-frontend:latest ./frontend
+
       - name: Push Backend Image
         run: |
           docker push ${{ secrets.DOCKERHUB_USER }}/employee-portal-backend:latest
@@ -46,14 +52,11 @@ on :
         with:
           host: ${{ secrets.EC2_HOST_ADDRESS }}
           username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_PASSWORD}}
-
+          key: ${{ secrets.EC2_PASSWORD }}
           script: |
             cd Docker-Project-
             docker compose down
             docker pull ${{ secrets.DOCKERHUB_USER }}/employee-portal-backend:latest
             docker pull ${{ secrets.DOCKERHUB_USER }}/employee-portal-frontend:latest
-            docker compose up -d 
-            docker ps 
-
-
+            docker compose up -d
+            docker ps
