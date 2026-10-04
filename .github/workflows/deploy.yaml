@@ -1,11 +1,11 @@
 name: Ci/CD pipeline for two tier application_employee management portal
- on :
+on :
   push:
    branches: 
    - main
    jobs: build and depoly the application
    runs-on: ubuntu:latest
-     steps:
+   steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
       - name: Show System Information
